@@ -1,0 +1,233 @@
+#sidebar {
+	background-color: #0D6EFD;
+	height: 100vh;
+	display: block;
+	overflow: hidden;
+	width: 290px;
+	position: fixed;
+
+
+}
+
+.footerstyleUploadProcess {
+	margin-top: 80px;
+
+}
+
+
+
+#customMenu {
+	background-color: green;
+	display: none;
+
+}
+
+
+
+body::-webkit-scrollbar {
+	width: 2px;
+
+}
+
+/* Track */
+body::-webkit-scrollbar-track {
+	background: #f1f1f1;
+
+
+
+}
+
+/* Handle */
+body::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 50px;
+
+}
+
+/* Handle on hover */
+body::-webkit-scrollbar-thumb:hover {
+	background: #555;
+
+}
+
+
+#dropnotif::-webkit-scrollbar {
+	width: 2px;
+
+}
+
+/* Track */
+#dropnotif::-webkit-scrollbar-track {
+	background: #f1f1f1;
+
+
+
+}
+
+/* Handle */
+#dropnotif::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 50px;
+
+}
+
+/* Handle on hover */
+#dropnotif::-webkit-scrollbar-thumb:hover {
+	background: #555;
+
+}
+
+#dropnotif1::-webkit-scrollbar {
+	width: 2px;
+
+}
+
+/* Track */
+#dropnotif1::-webkit-scrollbar-track {
+	background: #f1f1f1;
+
+
+
+}
+
+/* Handle */
+#dropnotif1::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 50px;
+
+}
+
+/* Handle on hover */
+#dropnotif1::-webkit-scrollbar-thumb:hover {
+	background: #555;
+
+}
+
+.content {
+	margin-left: 290px;
+}
+
+.collapse {
+	display: none;
+}
+
+#dropnotif {
+	text-decoration: none;
+	background-color: #E0A100;
+	color: black;
+	width: 350px;
+	height: 400px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.logo-wrapper .logo
+{
+	padding-left: 100vh;
+}
+
+
+footer {
+	background-color: green;
+	z-index: -1;
+	height: 53px;
+}
+
+footer p {
+	font-size: 13px;
+	font-family: arial;
+}
+
+#itemSidebar a:hover {
+	background-color: #E0A100;
+}
+
+#logout a:hover {
+	background-color: #E0A100;
+}
+
+#itemSidebar a:hover {
+	background-color: #E0A100;
+}
+
+.hoverColor:hover {
+	background-color: Gold;
+}
+
+#dropnotif:hover {
+	background-color: Gold;
+}
+
+
+
+.footerstyle {
+	margin-top: 456px;
+}
+
+.footerstyleAccount {
+	margin-top: 451px;
+}
+
+.footerstyleGraph {
+	margin-top: 74px;
+	z-index: -1;
+}
+
+.footerstyleUpload {
+	margin-top: 74px;
+}
+
+.footerstyleUploadRequest {
+	margin-top: 55px;
+}
+
+
+
+@media screen and (max-width: 1300px) {
+	#sidebar {
+		display: none !important;
+	}
+
+	.content {
+		margin-left: 0px;
+	}
+
+	#customMenu {
+		background-color: green;
+		display: block;
+	}
+
+	#headerCustom {
+		background-color: green;
+		display: none;
+	}
+
+	.collapse {
+		display: block;
+	}
+}
+
+
+
+@media screen and (max-width: 1366px) {
+	.footerstyle {
+		margin-top: 89px;
+	}
+
+	.footerstyleAccount {
+		margin-top: 151px;
+	}
+}
+
+@media screen and (max-width: 1100px) {
+	#item {
+		height: 100%;
+	}
+}
+
+
+@media screen and (max-width: 1000px) {
+	#carouselExampleIndicators {
+		display: none;
+	}
+}

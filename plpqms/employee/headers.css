@@ -1,0 +1,27 @@
+.form-control-dark {
+  border-color: var(--bs-gray);
+}
+.form-control-dark:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .25);
+}
+
+html body{
+	height: 100%;
+}
+.text-small {
+  font-size: 85%;
+}
+
+.dropdown-toggle {
+  outline: 0;
+}
+
+.headertop{
+	background: green;
+	z-index: 9999;
+}
+
+
+
+/* Create two equal columns that floats next to each other */
