@@ -3,7 +3,7 @@ session_start();
 error_reporting(0);
 require_once("connection.php");
 if(!isset($_POST["logIn"])){
-     header("location:../index.php");
+     header("location:../../index.php");
 }
 
 
@@ -86,7 +86,7 @@ $query=mysqli_query($conn,"SELECT * FROM  personnel_login WHERE email_address = 
    confirmButtonText: 'Okay',
    timer:2500
 }).then(function(){
-				 	window.location='../index.php'
+				 	window.location='../../index.php'
 				 	})
 				 </script>";
 			  } 
@@ -155,7 +155,7 @@ $query=mysqli_query($conn,"SELECT * FROM  personnel_login WHERE email_address = 
    confirmButtonText: 'Okay',
    timer:2500
 }).then(function(){
-				 	window.location='../index.php'
+				 	window.location='../../index.php'
 				 	})
 				 </script>";
 		}

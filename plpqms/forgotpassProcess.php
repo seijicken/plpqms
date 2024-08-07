@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(!isset($_POST['submit'])){
-    header("location:index.php");
+    header("location:../index.php");
 }
 ?>
 
@@ -287,7 +287,7 @@ if($_POST["newpass"] === $_POST["confirmpass"]){
   confirmButtonColor:'#00396D',
    confirmButtonText: 'Okay'
 }).then(function(){
-          window.location='index.php'
+          window.location='../index.php'
           })
          </script>";
         $_SESSION = NULL;

@@ -1,4 +1,4 @@
-<div?php session_start(); if(!isset($_SESSION["hr_email"])){ header("location: ../index.php"); }else {
+<div?php session_start(); if(!isset($_SESSION["hr_email"])){ header("location: ../../index.php"); }else {
   $uname=$_SESSION['hr_email']; } ?>
 
   <div?php require_once("connection.php"); $id=mysqli_real_escape_string($conn,$_SESSION['hr_email']);

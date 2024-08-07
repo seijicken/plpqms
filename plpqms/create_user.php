@@ -62,7 +62,7 @@ require 'PHPMailer/src/SMTP.php';
      $mail->addAddress($email_address);     //Add a recipient        //Name is optional
      $mail->addReplyTo('no-reply@cergorobaortu.edu.ph', 'No Reply');
 
-     $url="https://".$_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]). "/index.php";
+     $url="https://".$_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]). "/../index.php";
 
 
     //Optional name

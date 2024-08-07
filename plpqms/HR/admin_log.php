@@ -1,11 +1,10 @@
 <?php
-
-session_start();
-if(!isset($_SESSION["email_address"])){
+require_once("../session_expiry.php");
+if(!isset($_SESSION["hr_email"])){
     header("location:../../index.php");
 
 } else{
-    $uname = $_SESSION['email_address'];
+    $uname = $_SESSION['hr_email'];
 }
 ?>
 
@@ -14,21 +13,16 @@ if(!isset($_SESSION["email_address"])){
      require_once("connection.php");
 
 
- $id = mysqli_real_escape_string($conn,$_SESSION['email_address']);
+ $id = mysqli_real_escape_string($conn,$_SESSION['hr_email']);
 
+ 
 
- $r = mysqli_query($conn,"SELECT * FROM personnel_login where id = '$id'") or die (mysqli_error($con));
+ $r = mysqli_query($conn,"SELECT * FROM hr_user where id = '$id'") or die (mysqli_error($con));
 
  $row = mysqli_fetch_array($r);
+ 
  $username=$row['name'];
- $id=$row['email_address'];
-
-  $email=$row['email_address'];
-
-
-  // $fname=$row['fname'];
-  // $lname=$row['lname'];
-
+ $id=$row['hr_email'];
   // $fname=$row['fname'];
   // $lname=$row['lname'];
 
@@ -36,34 +30,55 @@ if(!isset($_SESSION["email_address"])){
 <!doctype html>
 <html lang="en">
   <head>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.101.0">
-    <link rel="icon" type="image/x-icon" href="./assets/img/PLP.png">
-    <title>PLP | QMS Upload File</title>
+    <link rel="icon" type="image/x-icon" href="../assets/img/PLP.png">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <title>PLP | QMS HR Log History</title>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/sidebars/">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
-
-    <script src="js/jquery-1.8.3.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ <script src="js/jquery-1.8.3.min.js"></script>
     <link rel="stylesheet" type="text/css" href="medias/css/dataTable.css" />
+    <link rel="stylesheet" type="text/css" href="medias/css/bulma.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/dataTables.bulma.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bulma.min.css" />
+    <link rel="stylesheet" type="text/css" href="medias/css/datatables.min.css" />
+
     <script src="medias/js/jquery.dataTables.js" type="text/javascript"></script>
     <!-- end table-->
     <script type="text/javascript" charset="utf-8">
-  $(document).ready(function(){
-      $('#dtable').dataTable({
-                "aLengthMenu": [[5, 10, 15, 25, 50, 100 , -1], [5, 10, 15, 25, 50, 100, "All"]],
+$(document).ready(function() {
+    var table = $('#dtable').DataTable( {
+        rowReorder: {
+            selector: 'td:nth-child(2)'
+        },
+         responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.modal( {
+                    header: function ( row ) {
+                        var data = row.data();
+                        return 'Details History for #'+data[0]+' - '+data[1];
+                    }
+                } ),
+                renderer: $.fn.dataTable.Responsive.renderer.tableAll( {
+                    tableClass: 'ui table'
+                } )
+            }
+        },
+         "aLengthMenu": [[5, 10, 15, 25, 50, 100 , -1], [5, 10, 15, 25, 50, 100, "All"]],
                 "iDisplayLength": 10
-                //"destroy":true;s
-            });
-  })
+    } );
+} );
     </script>
 
-    
 
     
 
@@ -127,6 +142,16 @@ if(!isset($_SESSION["email_address"])){
         -webkit-overflow-scrolling: touch;
       }
 
+        #loader{
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('../assets/img/rtuflipInside.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: 1;
+    }  
     </style>
 
     
@@ -134,6 +159,7 @@ if(!isset($_SESSION["email_address"])){
     <link href="sidebars.css" rel="stylesheet">
   </head>
   <body>
+    <!-- <div id="loader"></div> -->
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="bootstrap" viewBox="0 0 118 94">
     <title>Bootstrap</title>
@@ -202,20 +228,21 @@ if(!isset($_SESSION["email_address"])){
        <symbol id="email"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg></symbol>
      <symbol id="lock"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/></svg>
      </symbol>
-         <symbol id="notif"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg></symbol>
-     <symbol id="question"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM169.8 165.3c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM288 352c0 17.7-14.3 32-32 32s-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32z"/></svg></symbol>
-     <symbol id="key"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M512 176.001C512 273.203 433.202 352 336 352c-11.22 0-22.19-1.062-32.827-3.069l-24.012 27.014A23.999 23.999 0 0 1 261.223 384H224v40c0 13.255-10.745 24-24 24h-40v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24v-78.059c0-6.365 2.529-12.47 7.029-16.971l161.802-161.802C163.108 213.814 160 195.271 160 176 160 78.798 238.797.001 335.999 0 433.488-.001 512 78.511 512 176.001zM336 128c0 26.51 21.49 48 48 48s48-21.49 48-48-21.49-48-48-48-48 21.49-48 48z"/></svg></symbol>
-    <symbol id="view"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM323.8 202.5c-4.5-6.6-11.9-10.5-19.8-10.5s-15.4 3.9-19.8 10.5l-87 127.6L170.7 297c-4.6-5.7-11.5-9-18.7-9s-14.2 3.3-18.7 9l-64 80c-5.8 7.2-6.9 17.1-2.9 25.4s12.4 13.6 21.6 13.6h96 32H424c8.9 0 17.1-4.9 21.2-12.8s3.6-17.4-1.4-24.7l-120-176zM112 192c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48z"/></svg></symbol>
+           <symbol id="notif"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg></symbol>
+                        <symbol id="question"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM169.8 165.3c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM288 352c0 17.7-14.3 32-32 32s-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32z"/></svg></symbol>
+               <symbol id="key"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M512 176.001C512 273.203 433.202 352 336 352c-11.22 0-22.19-1.062-32.827-3.069l-24.012 27.014A23.999 23.999 0 0 1 261.223 384H224v40c0 13.255-10.745 24-24 24h-40v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24v-78.059c0-6.365 2.529-12.47 7.029-16.971l161.802-161.802C163.108 213.814 160 195.271 160 176 160 78.798 238.797.001 335.999 0 433.488-.001 512 78.511 512 176.001zM336 128c0 26.51 21.49 48 48 48s48-21.49 48-48-21.49-48-48-48-48 21.49-48 48z"/></svg></symbol>
+                   <symbol id="signout"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg"><path d="M160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96C43 32 0 75 0 128V384c0 53 43 96 96 96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H96c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32h64zM504.5 273.4c4.8-4.5 7.5-10.8 7.5-17.4s-2.7-12.9-7.5-17.4l-144-136c-7-6.6-17.2-8.4-26-4.6s-14.5 12.5-14.5 22v72H192c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32H320v72c0 9.6 5.7 18.2 14.5 22s19 2 26-4.6l144-136z"/></svg></symbol>
 
 </svg>
+
 
 <div class="row d-md-block w-100 ms-0">
     <div class="d-flex flex-column flex-shrink-0 p-3 pt-4 float-start" style="background-color: green;" id="sidebar">
     <a href="/" class="logo-wrapper">
-      <img class="img-fluid mt-0" src="./assets/img/PLPLOGO2.png" width="250px" height="250px"></img>
+      <img class="img-fluid mt-0" src="../assets/img/PLPLOGO2.png" width="250px" height="250px"></img>
     </a>
     <hr class="text-warning" style="background-color: orange;">
-    <ul class="nav nav-pills flex-column mb-auto px-1" id="itemSidebar">
+    <ul class="nav nav-pills flex-column mb-auto px-1"id="itemSidebar">
       <li class="nav-item">
         <a href="home.php" class="nav-link text-white" aria-current="page">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"/></svg>
@@ -229,18 +256,119 @@ if(!isset($_SESSION["email_address"])){
         </a>
       </li>
       <li>
-       <a href="add_requests.php" class="nav-link dropdown-item text-white">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#addrescard"/></svg>
-           Upload Documents
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#user"/></svg>
+          <span>HR Files</span>
+        </a>
+      <ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+         <li>
+        <a href="add_file.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Upload Files
         </a></li>
-      <li>
-               <li>
-        <a href="ceatfolder.php" class="nav-link text-white">
+        <li>
+        <a href="ownfiles.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - In Progress Files
+        </a></li>
+        <li>
+        <a href="privatefiles.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Approved Files
+        </a></li>
+      </ul>
+      </li>
+
+      <!-- <li>
+        <a href="addfile.php" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"/></svg>
+          Add Document
+        </a>
+      </li> -->
+          <li>
+        <a href="pastFiles.php" class="nav-link text-white">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
           Manage All Files
         </a>
       </li>
-           <li>
+      <!--
+            <li>
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#addrescard"/></svg>
+          Manage All Request
+        </a><ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+        <a href="requestsfolder.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - All Request
+        </a></li>
+        <li>
+        <a href="addrequests.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Create Request
+        </a></li>
+      </ul>
+      </li>
+           -->
+    <!-- <li>
+        <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
+          <svg class="bi pe-none me-2" width="20" height="16"><use xlink:href="#users"/></svg>Add Employee Account
+        </a>
+      </li> -->
+            <li>
+        <a href="add_offices.php" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#building"/></svg>
+          Department Offices
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#addrescard"/></svg>
+          View Account
+        </a><ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+        <a href="view_acc.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Admins Accounts
+        </a></li>
+        <li>
+        <a href="view_user.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - HR Accounts
+        </a></li>
+        <li>
+        <a href="view_user.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Personnel Account
+        </a></li>
+      </ul>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(202, 202, 202, .65);">
+          <svg class="bi pe-none me-1" width="20" height="16"><use xlink:href="#userclock"/></svg>
+          View Login History
+        </a>
+          <ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+          <a href="admin_log.php" class="nav-link dropdown-item text-white"  style="background-color: rgba(202, 202, 202, .65);">
+            <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
+            - Admin Login History
+          </a></li>
+          <li>
+          <a href="hr_log.php" class="nav-link dropdown-item text-white">
+            <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
+            - HR Login History
+          </a></li>
+          <li>
+          <a href="user_log.php" class="nav-link dropdown-item text-white">
+            <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
+            - Personnel Login History
+          </a></li>
+      </ul>
+      </li>
+      <li>
+        <a href="settings.php" class="nav-link text-white">
+        <i class="fa-solid fa-gear pe-0 me-2" style="color: #ffffff;"></i>
+          Settings
+        </a>
+      </li>
     </ul>
     <div class="dropdown" id="namePosition">
   <hr class="text-warning">
@@ -262,15 +390,53 @@ if(!isset($_SESSION["email_address"])){
     </li>
   </ul>
 </div>
+<script>
+function confirmSignOut() {
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            cancelButton: 'btn btn-danger',
+            confirmButton: 'btn btn-primary ms-2'
+        },
+        buttonsStyling: false
+    });
+
+    swalWithBootstrapButtons.fire({
+        title: 'Are you sure?',
+        text: "You will be signed out.",
+        icon: 'warning',
+        showCancelButton: true,
+        cancelButtonText: 'No, cancel!',
+        confirmButtonText: 'Yes, sign me out!',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // If confirmed, navigate to the logout script
+            window.location.href = 'logout.php';
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            // If canceled, show a message (optional)
+            swalWithBootstrapButtons.fire(
+                'Cancelled!',
+                'You are not signed out.',
+                'error'
+            );
+        }
+    });
+}
+</script>
+</li>
       </ul>
+    
     </div>
   </div>
 </div>
-   <div class="col-md-12 headertop ms-0" style= " background-color: green; z-index: -1;" id="headerCustom">
+      <div class="col-md-12 headertop ms-0" style= " background-color: green; z-index: -1;" id="headerCustom">
     <header class="ms-0 w-100 py-4 mb-6 border-bottom border-5 border-warning" style="height: 80px; z-index: -1">
            <div class="dropstart float-end">
         <li class="dropdown" style="list-style: none;">
-          <span style = "color: white">Welcome Personnel ! ! </span>
+        <span class="text-white">Welcome HR!!</span> &nbsp;
   <a href="#" class="dropdown-toggle text-light text-decoration-none" id="notiftoggle" data-bs-toggle="dropdown" aria-expanded="false"><span class="badge rounded-pill bg-danger count" style="border-radius:10px;"></span><svg class="me-4" width="20" height="18" ><use xlink:href="#notif"/></svg>
     </a>
   <ul class="dropdown-menu border-top border-start border-end border-dark border-bottom border-4 rounded-3" id="dropnotif" style="text-decoration: none; background-color: #E0A100; color:black; width: 350px; height: 400px; overflow-x:hidden; overflow-y: auto; "> </ul>
@@ -284,11 +450,13 @@ if(!isset($_SESSION["email_address"])){
 <div class="collapse" id="navbarToggleExternalContent" style="background-color: green;">
   <div class="dark p-4">
 
-    <a href="/" class="logo-wrapper">
-      <img class="img-fluid mt-0" src="./assets/img/PLPLOGO2.png" width="250px" height="250px"></img>
+
+
+    <a href="home.php" class="logo-wrapper">
+      <img class="img-fluid mt-0" src="../assets/img/PLPLOGO2.png" width="250px" height="250px"></img>
     </a>
     <hr class="text-warning" style="background-color: orange;">
-    <ul class="nav nav-pills flex-column mb-auto px-1" id="itemSidebar">
+    <ul class="nav nav-pills flex-column mb-auto px-1"id="itemSidebar">
       <li class="nav-item">
         <a href="home.php" class="nav-link text-white" aria-current="page">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"/></svg>
@@ -304,50 +472,127 @@ if(!isset($_SESSION["email_address"])){
       <li>
         <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#user"/></svg>
-          <?php echo ucwords(htmlentities($username)); ?> Files
+          <span>HR Files</span>
         </a>
       <ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+         <li>
+        <a href="add_file.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Upload Files
+        </a></li>
+        <li>
         <a href="ownfiles.php" class="nav-link dropdown-item text-white">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
-           - My Upload Files
+           - In Progress Files
         </a></li>
         <li>
-        <a href="acknowledged_files.php" class="nav-link dropdown-item text-white">
+        <a href="privatefiles.php" class="nav-link dropdown-item text-white">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
-           - Acknowledged Files
-        </a></li>
-        
-        <li>
-        <a href="sharedwithme.php" class="nav-link dropdown-item text-white">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
-           - Shared With Me
-        </a></li>
-        <li>
-        <a href="#" class="nav-link dropdown-item text-white">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
-           - My Signature
+           - Approved Files
         </a></li>
       </ul>
       </li>
-      <!-- <li>
-        <a href="addfile.php" class="nav-link text-white" style="background-color: rgba(202, 202, 202, .65);"">
+
+      <!--
+      <li>
+        <a href="addfile.php" class="nav-link text-white">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"/></svg>
           Add Document
         </a>
-      </li> -->
+      </li>
+-->
                <li>
-        <a href="ceatfolder.php" class="nav-link text-white">
+        <a href="pastFiles.php" class="nav-link text-white">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
           Manage All Files
         </a>
       </li>
-           <li>
-        <a href="add_requests.php" class="nav-link dropdown-item text-white">
+      <!--
+            <li>
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#addrescard"/></svg>
-           Create Request
+          Manage All Request
+        </a><ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+        <a href="requestsfolder.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - All Request
         </a></li>
+        <li>
+        <a href="addrequests.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Create Request
+        </a></li>
+      </ul>
+      </li>
+-->
+    <!-- <li>
+        <a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
+          <svg class="bi pe-none me-2" width="20" height="16"><use xlink:href="#users"/></svg>Add Employee Account
+        </a>
+      </li> -->
+            <li>
+        <a href="add_offices.php" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#building"/></svg>
+          Department Offices
+        </a>
+      </li>
+      <li>
+        <a href="add_offices.php" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#building"/></svg>
+          Department Offices
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#addrescard"/></svg>
+          View Account
+        </a><ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+        <a href="view_acc.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Admins Accounts
+        </a></li>
+        <li>
+        <a href="view_user.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - HR Accounts
+        </a></li>
+        <li>
+        <a href="view_user.php" class="nav-link dropdown-item text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
+           - Personnel Account
+        </a></li>
+      </ul>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(202, 202, 202, .65);">
+          <svg class="bi pe-none me-1" width="20" height="16"><use xlink:href="#userclock"/></svg>
+          View Login History
+        </a>
+          <ul class="dropdown-menu fw-normal border-top border-bottom border-3 border-warning ms-3" style="background-color: green;"><li>
+          <a href="admin_log.php" class="nav-link dropdown-item text-white"  style="background-color: rgba(202, 202, 202, .65);">
+            <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
+            - Admin Login History
+          </a></li>
+          <li>
+          <a href="user_log.php" class="nav-link dropdown-item text-white">
+            <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
+            - HR Login History
+          </a></li>
+          <li>
+          <a href="user_log.php" class="nav-link dropdown-item text-white">
+            <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
+            - Personnel Login History
+          </a></li>
+      </ul>
+      </li>
+      <li>
+        <a href="settings.php" class="nav-link text-white">
+        <i class="fa-solid fa-gear pe-0 me-2" style="color: #ffffff;"></i>
+          Settings
+        </a>
+      </li>
     </ul>
-     <div class="dropdown" id="namePosition">
+    <div class="dropdown" id="namePosition">
   <hr class="text-warning">
   <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
     <img src="../../assets/img/user.png" alt="" width="35" height="35" class="bg-light rounded-circle me-2">
@@ -367,6 +612,47 @@ if(!isset($_SESSION["email_address"])){
     </li>
   </ul>
 </div>
+<script>
+function confirmSignOut() {
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            cancelButton: 'btn btn-danger',
+            confirmButton: 'btn btn-primary ms-2'
+        },
+        buttonsStyling: false
+    });
+
+    swalWithBootstrapButtons.fire({
+        title: 'Are you sure?',
+        text: "You will be signed out.",
+        icon: 'warning',
+        showCancelButton: true,
+        cancelButtonText: 'No, cancel!',
+        confirmButtonText: 'Yes, sign me out!',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // If confirmed, navigate to the logout script
+            window.location.href = 'logout.php';
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            // If canceled, show a message (optional)
+            swalWithBootstrapButtons.fire(
+                'Cancelled!',
+                'You are not signed out.',
+                'error'
+            );
+        }
+    });
+}
+</script>
+</li>
+      </ul>
+    
+    </div>
+  </div>
 
 
 </div>
@@ -376,10 +662,9 @@ if(!isset($_SESSION["email_address"])){
       <svg class="" width="20" height="20"><use xlink:href="#gear-fill"/></svg>
       MENU
     </button>
-
-                <div class="mt-2 dropstart float-end">
+        <div class="mt-2 dropstart float-end">
         <li class="dropdown" style="list-style: none;">
-        <span style = "color: white">Welcome Personnel ! ! </span>
+        <span class="text-white">Welcome HR!!</span> &nbsp;
   <a href="#" class="dropdown-toggle text-light text-decoration-none" id="notiftoggle1" data-bs-toggle="dropdown" aria-expanded="false"><span class="badge rounded-pill bg-danger count1" style="border-radius:10px;"></span><svg class="me-4" width="20" height="18" ><use xlink:href="#notif"/></svg>
     </a>
   <ul class="dropdown-menu border-top border-start border-end border-dark border-bottom border-4 rounded-3" id="dropnotif1" style="text-decoration: none; background-color: #E0A100; color:black; width: 350px; height: 400px; overflow-x:hidden; overflow-y: auto; "> </ul>
@@ -394,21 +679,20 @@ if(!isset($_SESSION["email_address"])){
 </div>
 
 <div class="content">
-<div class="row ms-0 w-100" style="position: relative;">
- <div class="col-md-12 headertop ms-0 rounded-4">
-   <div class="container-fluid mt-5 rounded-4">
+    <div class="row ms-0 w-100" style="position: relative;">
+      <div class="col-md-12 headertop ms-0 rounded-4">
+        <div class="container-fluid mt-5 rounded-4">
 
-      <!-- Heading -->
-      <div class="card mb-4 wow fadeIn rounded-4">
+          <!-- Heading -->
+          <div class="card mb-4 wow fadeIn rounded-4">
 
-        <!--Card content-->
-        <div class="card-body d-sm-flex justify-content-between shadow bg-light rounded-4">
+            <!--Card content-->
+            <div class="card-body d-sm-flex justify-content-between shadow bg-light rounded-4">
 
-          <h4 class="mb-2 mb-sm-0 pt-1 fw-bold rounded-4">
-            <a href="dashboard.php" style="text-decoration: none; color:  #424242; "> UPLOAD DOCUMENT</a>
-          
-          </h4>
-<!-- 
+              <h4 class="mb-2 mb-sm-0 pt-1 fw-bold rounded-4">
+                <span style="color: #E0A100;">ADMIN HISTORY</span>
+              </h4>
+              <!-- 
           <form class="d-flex justify-content-center">
        
             <input type="search" placeholder="Type your query" aria-label="Search" class="form-control">
@@ -418,63 +702,160 @@ if(!isset($_SESSION["email_address"])){
 
           </form> -->
 
+            </div>
+
+          </div>
+        </div>
+        <!--Grid column-->
+        <!--Grid column-->
+      </div>
+      <div class="col-md-12">
+        <div class="container-fluid">
+          <div class="table-responsive">
+            <table id="dtable" class="table table-striped w-100">
+
+
+              <thead>
+                <!-- <th>ID</th> -->
+                <th class="all">USER LOGGED</th>
+                <th class="none">YOUR IP</th>
+                <th class="none">HOST</th>
+                <th class="desktop">ACTION</th>
+                <th class="desktop">TIMEIN</th>
+                <th class="none">ACTION</th>
+                <th class="none">TIMEOUT</th>
+              </thead>
+              <tbody>
+                <?php
+                require_once ("connection.php");
+
+                $query = "SELECT * from history_log1";
+                $result = mysqli_query($conn, $query);
+                while ($file = mysqli_fetch_array($result)) {
+                  //  $id =  $file['id'];
+                  $name = $file['admin_user'];
+                  $ip = $file['ip'];
+                  $host = $file['host'];
+                  $action = $file['action'];
+                  $logintime = $file['login_time'];
+                  $actions = $file['actions'];
+                  $logouttime = $file['logout_time'];
+
+                  ?>
+
+                  <tr>
+                    <!-- <td><?php echo $id; ?></td> -->
+                    <td><?php echo $name; ?></td>
+                    <td><?php echo $ip; ?></td>
+                    <td><?php echo $host; ?></td>
+                    <td><?php echo $action; ?></td>
+                    <td><?php echo $logintime; ?></td>
+                    <td><?php echo $actions; ?></td>
+                    <td><?php echo $logouttime; ?></td>
+
+                  </tr>
+
+                <?php } ?>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-      </div>
-  </div>
-        <!--Grid column-->
-       <!--Grid column-->
-</div>
 
- <div class="col-md-12 headertop ms-0 ">
-<div class="container-fluid">
-    <!--   <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalRegisterForm">Add File</button> -->
-   
-    <hr>
+        <!--/.Card-->
+
+
+
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <!--Card-->
+        <!--Grid column-->
+
+      </div>
+    </div>
+    <div class="footerstyleAccount">
+      <div class="col-md-12 headertop ms-0 position-relative bottom-0 start-0">
+        <footer class="ms-0 w-100 py-3 mb-5 border-top border-5 border-warning mt-4" style="background-color: green;"
+          id="footerSize">
+          <center>
+            <p class="text-light my-0" id="footerText"> COPYRIGHT PAMANTASAN NG LUNSGOD NG PASIG ALL RIGHT RESERVED
+              &copy; 2023</p>
+          </center>
+        </footer>
+      </div>
     </div>
   </div>
 
-<center>
-  <div class="d-flex justify-content-center col-md-6">
-    <div class="container-fluid mt-5">
-
-    <div class="text-center">
-<div class=" card rounded-4 border-bottom border-top border-5">
-<h5 class="card-header info-color white-text text-center py-4">
- <span style = color:#008000> UPLOAD FILE </span>
-  </h5>
-  <div class=" card-body px-lg-6 pt-0">
-    <div class="container">
-      <div class="row"><br><br>
-        <form action="process.php" id="add_form" method="post" enctype="multipart/form-data">
-          <div class="col-md-11">
-              <div class="md-form mb-0 text-center ms-5">
-                <input type="hidden" name="email" value="<?php echo ucwords(htmlentities($email)); ?>" class="form-control " readonly="">
-               
-                <input type="hidden" value="" class="form-control" readonly="">
-              </div>
-            </div>
-
-<center>
-<div class="col-md-10 mt-4">
-<div class="input-group">
-  
-  <input class="form-control fw-bold rounded-3" type="file" name="pdfFile" id="pdfFile" accept=".pdf" required>
 </div>
-</div>
-</center>
 
-<center>
-<div class="col-md-10 mt-2">
-  <textarea class="form-control" id="exampleFormControlTextarea1" name="description" rows="4" placeholder="Enter Description Message" style="resize: none;"></textarea>
-</div>
-</center>
 
-<div class="row d-flex justify-content-center">
-<div class="col-md-5 mt-2">
-  <select class="form-select fw-bold" name="department" aria-label="Default select example" required>
-    <option selected value="">Choose Folder</option>
- <?php
+
+
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+
+      <script src="sidebars.js"></script>
+
+     <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
+
+    <script type="text/javascript" src="js/popper.min.js"></script>
+
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/rr-1.2.8/datatables.min.js"></script>
+
+
+
+  <div class="modal fade" id="modalRegisterForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+
+  <!--
+   <form action="create_admin.php" method="POST" id="form">
+  <div class="modal-dialog modal-dialog-centered rounded-5" role="document">
+    <div class="modal-content bg-light rounded-5">
+      <div class="modal-header text-center rounded-5">
+        <h4 class="modal-title w-100 rounded-4" style="color: green;"> ADD EMPLOYEE ACCOUNT</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+        </button>
+      </div>
+      <div class="modal-body rounded-4">
+           <div class="md-form mb-0">
+            <center>
+            <img src="../assets/img/userplus.gif" height="250" width="250">
+            </center>
+        </div>
+        
+       <div class="form-floating mb-3">
+        <input type="text" class="form-control rounded-4" id="name" placeholder="Enter email" name="name">
+        <label for="email"><svg class="" width="20" height="20"><use xlink:href="#user"/></svg>   Enter Name</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control rounded-4" id="email" placeholder="Enter email" name="admin_user">
+        <label for="email"><svg class="" width="20" height="20"><use xlink:href="#email"/></svg>   Enter Email</label>
+    </div>
+
+      <div class="form-floating mb-3">
+        <input type="password" class="form-control rounded-4" id="pass" placeholder="Enter password" name="admin_password" required>
+        <label for="email"><svg class="" width="20" height="20"><use xlink:href="#lock"/></svg>   Enter Password</label>
+    </div>
+    
+
+    <div class="row">
+        <div class="col md-6 form-floating mb-3">
+        <select class="form-select rounded-4" aria-label="Default select example" required name="user_status" onchange="userType(this.value);">
+          <option selected value="Admin">        Admin</option>
+          <option value="User">        User</option>
+        </select>
+        <label class="ms-2 mb-1"><svg class="" width="20" height="20"><use xlink:href="#users"/></svg>  Admin or Employee</label>
+    </div>
+
+ <div class=" col md-6 form-floating mb-3">
+  <select class="form-select rounded-4" name="designation" aria-label="Default select example"  id="lastname" required>
+    <option selected value="">Choose Designation</option>
+ <//?php
          require_once("connection.php");
 
         $query="SELECT OFFICES FROM department_office";
@@ -484,41 +865,29 @@ if(!isset($_SESSION["email_address"])){
          $offices = $file['OFFICES'];
       
           ?>    
-    <option value="<?php echo $offices; ?>"><?php echo $offices; ?> Folder</option>  <?php  } ?>
+    <option value="<//?php echo $offices; ?>"><//?php echo $offices; ?> Office</option>  <//?php  } ?>
 
 </select>
+
+<label class="ms-2 mb-1"><svg class="" width="20" height="20"><use xlink:href="#building"/></svg>  Designation Office</label>
 </div>
 
-<div class="col-md-5 mt-2">
-  <select class="form-select fw-bold" name="sendTo" aria-label="Default select example"  id="lastname" required>
-    <option selected value="">Send File to</option>
-    <option value="All">Send to All</option>
- <?php
-         require_once("connection.php");
-
-        $query="SELECT NAME FROM personnel_login WHERE NAME!='$username'";
-        $result=mysqli_query($conn,$query);
-        while($file=mysqli_fetch_assoc($result)){
-
-         $sendUser = $file['NAME'];
-      
-          ?>    
-    <option  name="sentuser" value="<?php echo $sendUser; ?>">Send to <?php echo $sendUser; ?></option>  <?php  } ?>
-
-</select>
-</div>
-</div>
+  </div>
 
 
-          <button type="submit" class="btn fw-bold btn-rounded btn-block mt-3 mb-3 waves-effect z-depth-0 rounded-4" name="save" id="addnew"style ="background:#E0A100;" ><i class="fa fa-upload"></i>   UPLOAD FILE</button>
-         <p class="fw-bold" style="font-size: 12px"><b>File Type:</b><font color="red"><i>PDF only</i></font></p>
-         <p class="fw-bold" style="font-size: 12px; margin-top:-15px;"><b>Max File Upload: </b><font color="red"><i>1 File Per Upload Only!!</i></font></p>
-        </form>
+      <div class="modal-footer d-flex justify-content-center" id="reg" >
+        <button class="btn btn-warning fw-bold rounded-4"  name="reg">CREATE ADMIN ACCOUNT </button>
       </div>
+
+      <div class="modal-footer d-flex justify-content-center" id="reguser" style="visibility: hidden; position: absolute;">
+        <button class="btn btn-warning fw-bold rounded-4"  name="reguser"  >CREATE EMPLOYEE ACCOUNT </button>
+      </div>
+      
     </div>
   </div>
-</div>
+  </form>
 
+  -->
 
 <script type = "text/javascript">
 $(document).ready(function(){
@@ -553,138 +922,6 @@ $(document).ready(function(){
   }, 5000);
  
 });
-</script>
-
-
-
-
-<!-- Material form login -->
-   <br><br>
-</div>
-   </div>
-</div>
-
-
-</div>
-<div class="footerstyleUpload1">
-             <div class="col-md-12 headertop ms-0 position-relative bottom-0 start-0"  >
-    <footer class="ms-0 w-100 py-3 mb-5 border-top border-5 border-warning mt-4" style="background-color: green;" id="footerSize">
-      <center><p class="text-light my-0"id="footerText"> COPYRIGHT PAMANTASAN NG LUNSGOD NG PASIG ALL RIGHT RESERVED &copy; 2023</p></center>
-    </footer>
-</div></div>
-</div>
-
-
-    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
-
-      <script src="sidebars.js"></script>
-
-  </script>
-
-
-  <div class="modal fade" id="modalRegisterForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-  aria-hidden="true">
-
-  <form action="create_admin.php" method="POST" id="form">
-  <div class="modal-dialog modal-dialog-centered border-bottom border-top border-5 rounded-4" role="document">
-    <div class="modal-content bg-light">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold" style="color: green;"><svg class="" width="32" height="32"><use xlink:href="#userPlus"/></svg> ADD EMPLOYEE ACCOUNT</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-      </div>
-      <div class="modal-body">
-           <div class="md-form mb-2">
-        </div>
-
-
-        <div class="form mb-3">
-        <label class="ms-1 mb-1"><svg class="" width="20" height="20"><use xlink:href="#users"/></svg>  Admin or Employee</label>
-        <select class="form-select " aria-label="Default select example" name="user_status" onchange="userType(this.value);"> 
-          <option value="Admin">        Admin</option>
-          <option value="User">        User</option>
-        </select>
-    </div>
-        
-       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="name" placeholder="Enter email" name="name">
-        <label for="name"><svg class="" width="20" height="20"><use xlink:href="#user"/></svg>   Enter Name</label>
-    </div>
-
-    <div class="form-floating mb-3">
-        <input type="email" class="form-control" id="email" placeholder="Enter email" name="admin_user">
-        <label for="email"><svg class="" width="20" height="20"><use xlink:href="#email"/></svg>  Enter Email</label>
-    </div>
-
-      <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="pass" placeholder="Enter password" name="admin_password" required>
-        <label for="pwd"><svg class="" width="20" height="20"><use xlink:href="#lock"/></svg>   Enter Password</label>
-    </div>
-    
-    
-            <div class="form-floating mb-3" id="recovery">
-        <select class="form-select " aria-label="Default select example" name="question">
-        <option disabled selected value=""> Pick a recovery question: </option>
-          <option value="What is your nickname?">What is your nickname?</option>
-          <option value="What is your favorite number?">What is your favorite number?</option>
-          <option value="What is your favorite movie?">What is your favorite movie?</option>
-        </select>
-
-        <label for="email"><svg class="" width="20" height="20"><use xlink:href="#question"/></svg>   Pick a Security Question</label>
-        <div class="form-floating mt-3">
-        <input type="text" class="form-control" id="answer" placeholder="Enter answer" required="" name="answer">
-        <label for="text"><svg class="" width="20" height="20"><use xlink:href="#lock"/></svg>   Enter Security Answer</label>
-      </div>
-    </div>
-
-      
-   
-      <div class="modal-footer d-flex justify-content-center" id="reg" >
-        <button class="btn btn-warning fw-bold"  name="reg">CREATE ADMIN ACCOUNT </button>
-      </div>
-
-      <div class="modal-footer d-flex justify-content-center" id="reguser" style="visibility: hidden; position: absolute;">
-        <button class="btn btn-warning fw-bold"  name="reguser"  >CREATE EMPLOYEE ACCOUNT </button>
-      </div>
-      
-    </div>
-  </div>
-  </form>
-</div>
-
-<script>
-  
-function userType(value){
-
-let val = value;
-
-
-if (val === "User") {
- 
-  document.getElementById("reguser").style.visibility = "visible";
-  document.getElementById("reguser").style.position = null;
-  document.getElementById("reg").style.visibility = "hidden";
-  document.getElementById("reg").style.position = "absolute";
-
-  document.getElementById("email").name = "email_address";
-  document.getElementById("pass").name = "user_password";
-
-  document.getElementById("form").action = "create_user.php";
-} else{
-  
-  document.getElementById("reg").style.visibility = "visible";
-  document.getElementById("reg").style.position = null;
-  document.getElementById("reguser").style.visibility = "hidden";
-  document.getElementById("reguser").style.position = "absolute";
-
-  document.getElementById("email").name = "admin_user";
-  document.getElementById("pass").name = "admin_password";
-  
-
-  document.getElementById("form").action = "create_admin.php";
-}
-
-}
 </script>
 
 <script type = "text/javascript">
@@ -723,7 +960,41 @@ $(document).ready(function(){
 </script>
 
 
+<script>
+  
+function userType(value){
 
+let val = value;
+
+
+if (val === "User") {
+ 
+  document.getElementById("reguser").style.visibility = "visible";
+  document.getElementById("reguser").style.position = null;
+  document.getElementById("reg").style.visibility = "hidden";
+  document.getElementById("reg").style.position = "absolute";
+
+  document.getElementById("email").name = "email_address";
+  document.getElementById("pass").name = "user_password";
+
+  document.getElementById("form").action = "create_user.php";
+} else{
+  
+  document.getElementById("reg").style.visibility = "visible";
+  document.getElementById("reg").style.position = null;
+  document.getElementById("reguser").style.visibility = "hidden";
+  document.getElementById("reguser").style.position = "absolute";
+
+  document.getElementById("email").name = "admin_user";
+  document.getElementById("pass").name = "admin_password";
+  
+
+  document.getElementById("form").action = "create_admin.php";
+}
+
+}
+</script>
+  </body>
     <script type="text/javascript">
   $(window).on('load', function(){
     //you remove this timeout
@@ -734,119 +1005,5 @@ $(document).ready(function(){
       //$('#loader').fadeOut('slow'); 
   });
 </script>
-  </body>
-
 
 </html>
-
-
-<!-- v Start of process for Image Processing and CNN v -->
-<?php
-require_once("connection.php");
-include 'sweetAlert.php';
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $designation = $_POST['designation'];
-    $foldername = $_POST['department']; // Moved up to be defined before use in $uploadDir
-    $uploadDir = "uploads/$foldername/";
-
-    $sendto = $_POST['sendTo'];
-    $description = $_POST['description'];
-    $controlno = $_POST['controlno'];
-    $user = $_POST['email'];
-    date_default_timezone_set("Asia/Manila");
-    $time = date("M-d-Y h:i A");
-    $year = date("Y"); // Added year variable
-
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-
-    if (isset($_FILES["pdfFile"]) && $_FILES["pdfFile"]["error"] == UPLOAD_ERR_OK) {
-        $filename = 'PLP - ' . $_FILES['pdfFile']['name'];
-        $uploadFile = $uploadDir . basename($_FILES["pdfFile"]["name"]);
-        $extension = pathinfo($uploadFile, PATHINFO_EXTENSION); // Added file extension check
-
-        if (move_uploaded_file($_FILES["pdfFile"]["tmp_name"], $uploadFile)) {
-            $pdfFilePath = $uploadFile;
-            $outputPrefix = "output_image";
-            $pythonScriptPath = "C:\\xampp\\htdocs\\BJEN\\plpqmsV1.12\\plpqms\\plpqms\\employee\\4plp\\signature_extractor_and_pdf_to_img\\sample_project\\main.py";
-
-            // Pass PDF file path as an argument to the Python script
-            $command = "python \"$pythonScriptPath\" \"$pdfFilePath\" $outputPrefix 2>&1";
-            $output = shell_exec($command);
-            echo "<pre>$output</pre>";
-
-            // Check if the output contains "Genuine" or "Forge" and set the alert message
-            if (strpos($output, 'Genuine') !== false) {
-                $alertMessage = "Signature is genuine.";
-                $sendto = 'Private';
-            } elseif (strpos($output, 'Forge') !== false) {
-                $alertMessage = "Signature is forged.";
-                $sendto = $user;
-            } else {
-                $alertMessage = "Unknown signature status.";
-            }
-
-            if (in_array($extension, ['pdf'])) {
-                $sql = "INSERT INTO upload_files (controlNumber, NAME, DEPARTMENT, SIZE, DESCRIPTION, SENTBY, SENDTO, DOWNLOAD, TIMERS, TIMEDOWNLOAD, DESIGNATION, ADMIN_STATUS, EMAIL, YEAR, SEEN_STATUS, ARCHIVE) 
-                        VALUES ('$controlno','$filename','$foldername', '{$_FILES['pdfFile']['size']}','$description','$user', '$sendto', 0, '$time', 0, '$designation', 'Faculty', '$user', '$year', 0, 0)";
-
-                if (mysqli_query($conn, $sql)) {
-                    echo "<script type='text/javascript'>
-                            document.querySelector('body').style.overflow = 'hidden';
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Successfully Uploaded File!',
-                                text: 'Your File Has Been Successfully Uploaded and Sent to the User and Database!',
-                                confirmButtonColor: '#00396D',
-                                confirmButtonText: 'Okay',
-                                timer: 3000
-                            }).then(function(){
-                                window.location='add_file.php';
-                            });
-                            document.querySelector('body').style.overflow = 'visible';
-                          </script>";
-                } else {
-                    echo "<script type='text/javascript'>
-                            document.querySelector('body').style.overflow = 'hidden';
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Failed Uploading the File!',
-                                text: 'Failed to Upload the Necessary Files!',
-                                confirmButtonColor: '#00396D',
-                                confirmButtonText: 'Okay',
-                                timer: 3000
-                            }).then(function(){
-                                window.location='add_file.php';
-                            });
-                            document.querySelector('body').style.overflow = 'visible';
-                          </script>";
-                }
-            } else {
-                echo "<script type='text/javascript'>
-                       document.querySelector('body').style.overflow = 'hidden';
-                       Swal.fire({
-                          icon: 'error',
-                          title: '$filename',
-                          text: 'Your file extension must be: .Pdf!',
-                          confirmButtonColor: '#00396D',
-                          confirmButtonText: 'Okay',
-                          timer: 3000
-                       }).then(function(){
-                          window.location='add_file.php';
-                       });
-                       document.querySelector('body').style.overflow = 'visible';
-                  </script>";
-            }
-        } else {
-            echo "Error uploading the file.";
-        }
-    } else {
-        echo "No file uploaded or an error occurred.";
-    }
-}
-?>
-
-
-<!-- ^ End of Image Processing and CNN; Redirects back to add_file.php with alert message ^ -->

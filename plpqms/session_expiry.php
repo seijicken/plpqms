@@ -8,7 +8,7 @@ $timeout_duration = 900;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
     session_unset(); // Unset $_SESSION variable for the runtime
     session_destroy(); // Destroy session data in storage
-    header("Location: index.php"); // Redirect to login page
+    header("Location: ../../index.php"); // Redirect to login page
     exit();
 }
 

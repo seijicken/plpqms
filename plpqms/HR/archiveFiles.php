@@ -3,7 +3,7 @@
 session_start();
 
 if(!isset($_SESSION["hr_email"])){
-  header("location: ../index.php");
+  header("location: ../../index.php");
   
 }else {
   

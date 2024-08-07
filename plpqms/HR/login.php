@@ -33,7 +33,7 @@ $query=mysqli_query($conn,"SELECT * FROM hr_user WHERE hr_email = '$username'")o
    				confirmButtonText: 'Okay',
    				timer:2500
 				}).then(function(){
-				window.location='../index.php'
+				window.location='../../index.php'
 				 	})
 			</script>";
 			  } 
@@ -80,7 +80,7 @@ $query=mysqli_query($conn,"SELECT * FROM hr_user WHERE hr_email = '$username'")o
    						confirmButtonText: 'Okay',
    						timer:2500
 						}).then(function(){
-						window.location='../index.php'
+						window.location='../../index.php'
 				 		})
 						</script>";
 						}

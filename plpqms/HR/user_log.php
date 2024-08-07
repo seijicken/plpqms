@@ -1,7 +1,7 @@
 <?php
 require_once("../session_expiry.php");
 if(!isset($_SESSION["hr_email"])){
-    header("location:index.php");
+    header("location:../../index.php");
 
 } else{
     $uname = $_SESSION['hr_email'];
@@ -337,12 +337,12 @@ $(document).ready(function() {
         <li>
         <a href="view_user.php" class="nav-link dropdown-item text-white">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
-           - Faculty Account
+           - Personnel Account
         </a></li>
       </ul>
       </li>
       <li>
-        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(202, 202, 202, .65);">
           <svg class="bi pe-none me-1" width="20" height="16"><use xlink:href="#userclock"/></svg>
           View Login History
         </a>
@@ -359,7 +359,7 @@ $(document).ready(function() {
           <li>
           <a href="user_log.php" class="nav-link dropdown-item text-white" style="background-color: rgba(202, 202, 202, .65);">
             <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
-            - Faculty Login History
+            - Personnel Login History
           </a></li>
       </ul>
       </li>
@@ -559,12 +559,12 @@ function confirmSignOut() {
         <li>
         <a href="view_user.php" class="nav-link dropdown-item text-white">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#folder"/></svg>
-           - Faculty Account
+           - Personnel Account
         </a></li>
       </ul>
       </li>
       <li>
-        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <a href="#" class="nav-link text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(202, 202, 202, .65);">
           <svg class="bi pe-none me-1" width="20" height="16"><use xlink:href="#userclock"/></svg>
           View Login History
         </a>
@@ -581,7 +581,7 @@ function confirmSignOut() {
           <li>
           <a href="user_log.php" class="nav-link dropdown-item text-white">
             <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#history"/></svg>
-            - Faculty Login History
+            - Personnel Login History
           </a></li>
       </ul>
       </li>
@@ -690,7 +690,7 @@ function confirmSignOut() {
         <div class="card-body d-sm-flex justify-content-between shadow bg-light rounded-4">
 
         <h4 class="mb-2 mb-sm-0 pt-1 fw-bold rounded-4">
-            <span style="color: #E0A100;">USER HISTORY</span>
+            <span style="color: #E0A100;">PERSONNEL HISTORY</span>
           </h4>
 <!-- 
           <form class="d-flex justify-content-center">

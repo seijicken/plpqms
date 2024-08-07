@@ -135,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $mail->addAddress($email_address);
       $mail->addReplyTo('no-reply@cergorobaortu.edu.ph', 'No Reply');
 
-      $url = "https://" . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/index.php";
+      $url = "https://" . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/../index.php";
       //Content
       $mail->isHTML(true);
       $mail->Subject = 'Your Login Credentials at PLP | QMS';

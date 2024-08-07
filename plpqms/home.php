@@ -3,7 +3,7 @@
 require_once("session_expiry.php");
 
 if (!isset($_SESSION["admin_user"])) {
-  header("location: index.php");
+  header("location: ../index.php");
 
 } else {
 

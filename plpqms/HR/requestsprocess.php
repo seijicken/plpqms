@@ -1,10 +1,10 @@
 <?php
 session_start();
-if(!isset($_SESSION["admin_user"])){
-    header("location:index.php");
+if(!isset($_SESSION["hr_email"])){
+    header("location:../../index.php");
 
 } else{
-    $uname = $_SESSION['admin_user'];
+    $uname = $_SESSION['hr_email'];
 }
 ?>
 
@@ -13,17 +13,17 @@ if(!isset($_SESSION["admin_user"])){
      require_once("connection.php");
 
 
- $id = mysqli_real_escape_string($conn,$_SESSION['admin_user']);
+ $id = mysqli_real_escape_string($conn,$_SESSION['hr_email']);
 
  
 
- $r = mysqli_query($conn,"SELECT * FROM admin_login where id = '$id'") or die (mysqli_error($con));
+ $r = mysqli_query($conn,"SELECT * FROM hr_user where id = '$id'") or die (mysqli_error($con));
 
  $row = mysqli_fetch_array($r);
  
   $admin_status=$row['admin_status'];
   $username=$row['name'];
-  $email = $row['admin_user'];
+  $email = $row['hr_email'];
  
   // $fname=$row['fname'];
   // $lname=$row['lname'];

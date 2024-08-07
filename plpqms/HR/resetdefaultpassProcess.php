@@ -4,7 +4,7 @@ error_reporting(0);
 require_once("connection.php");
 
 if(!isset($_POST["submit"])){
-     header("location:index.php");
+     header("location:../../index.php");
 }
 ?>
 <!doctype html>
@@ -229,16 +229,16 @@ function unmask() {
 <?php
 if(isset($_POST['submit'])){
 
-$email = $_POST['email'];
+$email = $_POST['hr_email'];
 $status = $_SESSION["status"];
-$status1 = $_SESSION["admin_status"];
+$status1 = $_SESSION["hr_status"];
 
 $user_password = password_hash($_POST['newpass'], PASSWORD_DEFAULT, array('cost' => 12));
 
 if($_POST["newpass"] === $_POST["confirmpass"]){
 
 
-      $query = ("UPDATE `admin_login` SET `admin_password` = '$user_password' WHERE `admin_login`.`admin_user` = '$email'");
+      $query = ("UPDATE `hr_user` SET `hr_password` = '$user_password' WHERE `hr_user`.`hr_email` = '$email'");
 
       mysqli_query($conn, $query);   
 
@@ -246,7 +246,7 @@ if($_POST["newpass"] === $_POST["confirmpass"]){
       if (mysqli_query($conn, $query)) {
 
      
-        $query1 = "DELETE FROM newlycreatedadmin WHERE email='$email' AND status ='$status1'";
+        $query1 = "DELETE FROM newlycreatedhr WHERE email='$email' AND status ='$status1'";
 
        if (mysqli_query($conn, $query1)){   
            include "sweetAlert.php";

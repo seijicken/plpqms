@@ -3,7 +3,7 @@ session_start();
 error_reporting(0);
 require_once("connection.php");
 if(!isset($_POST["adminlog"])){
-     header("location:index.php");
+     header("location:../index.php");
 }
 
 date_default_timezone_set("asia/manila");
@@ -81,7 +81,7 @@ $query=mysqli_query($conn,"SELECT * FROM admin_login WHERE admin_user = '$userna
   confirmButtonColor:'#00396D',
    confirmButtonText: 'Okay',
 }).then(function(){
-				 	window.location='index.php'
+				 	window.location='../index.php'
 				 	})
 				 </script>";
 			  } 
@@ -154,7 +154,7 @@ $query=mysqli_query($conn,"SELECT * FROM admin_login WHERE admin_user = '$userna
    confirmButtonText: 'Okay',
 
 }).then(function(){
-				 	window.location='index.php'
+				 	window.location='../index.php'
 				 	})
 				 </script>";
 			}

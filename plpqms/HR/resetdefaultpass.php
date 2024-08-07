@@ -3,10 +3,10 @@ session_start();
 error_reporting(0);
 require_once("connection.php");
 
-$email= $_SESSION["admin_user"];
-$status = $_SESSION["admin_status"];
+$email= $_SESSION["email"];
+$status = $_SESSION["status"];
 
-$getEmailQuery = mysqli_query($conn, "SELECT email FROM newlycreatedadmin WHERE email ='$email' AND status = '$status'");
+$getEmailQuery = mysqli_query($conn, "SELECT email FROM newlycreatedhr WHERE email ='$email' AND status = '$status'");
 $rowCodes = mysqli_fetch_assoc($getEmailQuery);
 $email=$rowCodes['email'];
 $_SESSION["status"] = $rowCodes["status"];
@@ -22,7 +22,7 @@ include 'sweetAlert.php';
    confirmButtonText: 'Okay',
 
 }).then(function(){
-          window.location='index.php'
+          window.location='../../index.php'
           })
          </script>");
 }else{
@@ -223,7 +223,7 @@ function unmask() {
 
     <input type="checkbox" onclick="unmask()"> Show Password <br><br>
              <div class="form-floating mb-4">
-        <button type="button" onclick="goback()" id="submitbtn1" class="float-start btn mb-3 col-6 text-dark btn-floating rounded-3 font-weight-bold" style="background:#9B9B9B; font-weight:bold; "><a href="index.php" style="text-decoration: none; color:black;"><i class="fa fa-arrow-left"></i> Go Back</button></a>
+        <button type="button" onclick="goback()" id="submitbtn1" class="float-start btn mb-3 col-6 text-dark btn-floating rounded-3 font-weight-bold" style="background:#9B9B9B; font-weight:bold; "><a href="../../index.php" style="text-decoration: none; color:black;"><i class="fa fa-arrow-left"></i> Go Back</button></a>
         <button type="reset" id="resetbtn" class="float-end btn col-5 mb-3 text-dark btn-floating rounded-3 font-weight-bold" style="background:#E0A100; font-weight:bold; "><i class="fa fa-refresh"></i>   Reset</button>
 
         <button type="submit" id="submitbtn" name="submit" class="mt-0 btn col-12 text-dark btn-floating rounded-3 font-weight-bold" style="background:#E0A100; font-weight:bold; ">Reset Password</button>

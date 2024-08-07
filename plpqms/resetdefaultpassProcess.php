@@ -4,7 +4,7 @@ error_reporting(0);
 require_once("connection.php");
 
 if(!isset($_POST["submit"])){
-     header("location:index.php");
+     header("location:../index.php");
 }
 ?>
 <!doctype html>
@@ -257,7 +257,7 @@ if($_POST["newpass"] === $_POST["confirmpass"]){
   confirmButtonColor:'#00396D',
    confirmButtonText: 'Okay'
 }).then(function(){
-          window.location='index.php'
+          window.location='../index.php'
           })
          </script>";
         exit();

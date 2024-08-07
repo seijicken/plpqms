@@ -33,7 +33,7 @@ include 'sweetAlert.php';
    confirmButtonText: 'Okay',
 
 }).then(function(){
-          window.location='index.php'
+          window.location='../../index.php'
           })
          </script>");
 }else{

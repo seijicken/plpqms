@@ -254,7 +254,7 @@ exit();
     </div>
     <div class="ms-2">
         <button type="submit" id="submitbtn" onclick="goback()" name="submit" class="mt-0 mb-3 btn col-12 text-dark btn-floating rounded-3 font-weight-bold" style="background:#E0A100; font-weight:bold; " textContent="">Request Password Reset</button>
-        <a href="index.php" style="text-decoration: none; color:black;"><button type="button" id="submitbtn1" class="float-start btn mb-3 col-10 text-dark btn-floating rounded-3 font-weight-bold" style="background:#9B9B9B; font-weight:bold; "><i class="fa fa-arrow-left"></i> Go Back</button></a>
+        <a href="../index.php" style="text-decoration: none; color:black;"><button type="button" id="submitbtn1" class="float-start btn mb-3 col-10 text-dark btn-floating rounded-3 font-weight-bold" style="background:#9B9B9B; font-weight:bold; "><i class="fa fa-arrow-left"></i> Go Back</button></a>
         <button type="reset" id="resetbtn" class="btn btn-outline-warning col-2 mb-3 text-dark btn-floating rounded-3 font-weight-bold" style=" font-weight:bold; " ><i class="fa fa-refresh"></i></button>
       </div>
   </form>

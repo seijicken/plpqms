@@ -2,7 +2,7 @@
 
 session_start();
 if(!isset($_SESSION["email_address"])){
-    header("location:../index.php");
+    header("location:../../index.php");
 
 } else{
     $uname = $_SESSION['email_address'];

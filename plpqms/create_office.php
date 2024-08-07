@@ -3,7 +3,7 @@ session_start();
 require_once("connection.php");
 
 if(!isset($_SESSION["admin_user"])){
-    header("location:index.php");
+    header("location:../index.php");
 
 } else{
     $uname = $_SESSION['admin_user'];
